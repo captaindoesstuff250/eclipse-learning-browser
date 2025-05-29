@@ -1,0 +1,168 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Eclipse Learning Browser</title>
+<link href="logo.png" rel="icon" type="image/png"/>
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: url('https://upload.wikimedia.org/wikipedia/commons/0/00/NASA-HubbleGalaxy.jpg') no-repeat center center fixed;
+  background-size: cover;
+  color: #fff;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: radial-gradient(ellipse at bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.9) 100%);
+  z-index: -1;
+  animation: moveGalaxy 60s linear infinite;
+}
+
+@keyframes moveGalaxy {
+  0% { background-position: 0 0; }
+  100% { background-position: 1000px 0; }
+}
+
+
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #0a0a23;
+      color: #fff;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      background-color: #1e1e3f;
+      padding: 10px 20px;
+    }
+    header img {
+      height: 40px;
+      margin-right: 10px;
+    }
+    header h1 {
+      font-size: 20px;
+      margin: 0;
+    }
+    .search-bar {
+      margin: 20px;
+      display: flex;
+    }
+    .search-bar input[type="text"] {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+    }
+    .search-bar button {
+      padding: 10px 15px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #4444aa;
+      color: white;
+      border: none;
+    }
+    nav {
+      background-color: #14142b;
+      padding: 10px;
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+    }
+    nav button {
+      background-color: #2a2a4f;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+    .content {
+      padding: 20px;
+    }
+    iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+      background-color: white;
+    }
+    #apiInputArea {
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+<header>
+<img alt="Logo" src="logo.png"/>
+<h1>Eclipse Learning Browser</h1>
+</header>
+<div class="search-bar">
+<input id="searchInput" placeholder="Search with DuckDuckGo..." type="text"/>
+<button onclick="performSearch()">Go</button>
+</div>
+<nav>
+<button onclick="switchTab('home')">Home</button>
+<button onclick="switchTab('bookmarks')">Bookmarks</button>
+<button onclick="switchTab('mods')">Mods</button>
+</nav>
+<div class="content" id="tabContent">
+<p>Welcome to your custom space-themed browser. Use the tabs above to navigate.</p>
+</div>
+<script>
+    function performSearch() {
+      const query = document.getElementById("searchInput").value;
+      if (query.trim() !== "") {
+        window.open(`https://duckduckgo.com/?q=${encodeURIComponent(query)}`, "_blank");
+      }
+    }
+
+    function switchTab(tab) {
+      const tabContent = document.getElementById("tabContent");
+      if (tab === "home") {
+        tabContent.innerHTML = "<p>Welcome to your custom space-themed browser. Use the tabs above to navigate.</p>";
+      } else if (tab === "bookmarks") {
+        tabContent.innerHTML = "<p><strong>Bookmarks:</strong><br>No bookmarks yet.</p>";
+      } else if (tab === "mods") {
+        loadModsTab(tabContent);
+      }
+    }
+
+    function loadModsTab(container) {
+      const savedKey = localStorage.getItem("openai_api_key");
+      if (!savedKey) {
+        container.innerHTML = `
+          <div id="apiInputArea">
+            <p>Enter your OpenAI API Key to enable ChatGPT mods:</p>
+            <input type="password" id="apiKeyInput" placeholder="sk-...">
+            <button onclick="saveApiKey()">Save Key</button>
+          </div>
+        `;
+      } else {
+        showChat(container);
+      }
+    }
+
+    function saveApiKey() {
+      const key = document.getElementById("apiKeyInput").value;
+      if (key.startsWith("sk-")) {
+        localStorage.setItem("openai_api_key", key);
+        switchTab("mods");
+      } else {
+        alert("Invalid API Key format.");
+      }
+    }
+
+    function showChat(container) {
+      container.innerHTML = `
+        <p><strong>Chat with Byte (ChatGPT):</strong></p>
+        <iframe src="https://chat.openai.com/" title="ChatGPT Mods"></iframe>
+      `;
+    }
+  </script>
+</body>
+</html>
