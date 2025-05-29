@@ -1,0 +1,151 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Eclipse Browser 2 - Standalone</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0b0c2a;
+      color: white;
+    }
+    header {
+      background-color: #1e1f3d;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.5em;
+    }
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    nav a {
+      color: #8be9fd;
+      margin: 5px 10px;
+      text-decoration: none;
+    }
+    main {
+      padding: 20px;
+    }
+    .tab {
+      display: none;
+    }
+    .tab.active {
+      display: block;
+    }
+    #searchBar {
+      width: 90%;
+      max-width: 500px;
+      padding: 10px;
+      border: none;
+      border-radius: 4px;
+    }
+    #browserFrame {
+      width: 100%;
+      height: 500px;
+      margin-top: 20px;
+      border: none;
+    }
+    button {
+      margin: 5px;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      background-color: #282a36;
+      color: #f8f8f2;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #44475a;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🌌 Eclipse Browser 2</h1>
+    <nav>
+      <a href="#" onclick="openTab('home')">Home</a>
+      <a href="#" onclick="openTab('bookmarks')">Bookmarks</a>
+      <a href="#" onclick="openTab('mods')">Mods</a>
+    </nav>
+  </header>
+  <main id="tab-content">
+    <section id="home" class="tab active">
+      <input type="text" id="searchBar" placeholder="Search the stars..." />
+      <button onclick="search()">Go</button>
+      <button onclick="addBookmark()">Add Bookmark</button>
+      <iframe id="browserFrame"></iframe>
+    </section>
+    <section id="bookmarks" class="tab">
+      <h2>Bookmarks</h2>
+      <ul id="bookmarkList"></ul>
+    </section>
+    <section id="mods" class="tab">
+      <h2>Mods</h2>
+      <p>Mods features coming soon!</p>
+    </section>
+  </main>
+  <script>
+    function search() {
+      const query = document.getElementById("searchBar").value;
+      if (query) {
+        document.getElementById("browserFrame").src = "https://duckduckgo.com/?q=" + encodeURIComponent(query);
+      }
+    }
+
+    function openTab(tabId) {
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    function addBookmark() {
+      const url = document.getElementById("browserFrame").src;
+      const name = prompt("Name this bookmark:");
+      if (url && name) {
+        const bookmarks = JSON.parse(localStorage.getItem("bookmarks") || "[]");
+        bookmarks.push({ name, url });
+        localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
+        renderBookmarks();
+      }
+    }
+
+    function renderBookmarks() {
+      const list = document.getElementById("bookmarkList");
+      list.innerHTML = "";
+      const bookmarks = JSON.parse(localStorage.getItem("bookmarks") || "[]");
+      bookmarks.forEach((bm, index) => {
+        const item = document.createElement("li");
+        const link = document.createElement("a");
+        link.href = bm.url;
+        link.innerText = bm.name;
+        link.target = "_blank";
+
+        const delBtn = document.createElement("button");
+        delBtn.innerText = "🗑️";
+        delBtn.onclick = () => {
+          bookmarks.splice(index, 1);
+          localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
+          renderBookmarks();
+        };
+
+        item.appendChild(link);
+        item.appendChild(delBtn);
+        list.appendChild(item);
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderBookmarks();
+    });
+  </script>
+</body>
+</html>
